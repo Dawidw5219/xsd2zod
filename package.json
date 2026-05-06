@@ -1,0 +1,69 @@
+{
+  "name": "xsd2zod",
+  "version": "1.0.1",
+  "description": "Compile XSD (XML Schema) into Zod schemas. CLI tool — one .xsd in, one .ts out",
+  "private": false,
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "keywords": [
+    "xsd",
+    "xml-schema",
+    "zod",
+    "schema",
+    "validation",
+    "codegen",
+    "typescript",
+    "cli"
+  ],
+  "homepage": "https://github.com/Dawidw5219/xsd2zod#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dawidw5219/xsd2zod.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Dawidw5219/xsd2zod/issues"
+  },
+  "author": {
+    "name": "Dawid Wiewiórski",
+    "email": "biuro@app4you.dev"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "bin": {
+    "xsd2zod": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "pnpm typecheck && pnpm test && pnpm build",
+    "deploy": "pnpm typecheck && pnpm test && pnpm build && ghdeploy --npm"
+  },
+  "dependencies": {
+    "chalk": "^5.6.2",
+    "commander": "^12.1.0",
+    "fast-xml-parser": "^5.7.3"
+  },
+  "peerDependencies": {
+    "zod": ">=4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.2",
+    "zod": "^4.4.3"
+  }
+}
