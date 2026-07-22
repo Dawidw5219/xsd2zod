@@ -51,6 +51,7 @@ describe('runCompile dependency discovery', () => {
 			`<?xml version="1.0"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:nip">
   <xs:simpleType name="TNip">
+    <xs:annotation><xs:documentation>Identyfikator podatkowy NIP</xs:documentation></xs:annotation>
     <xs:restriction base="xs:string">
       <xs:length value="10"/>
       <xs:pattern value="[0-9]{10}"/>
@@ -67,6 +68,8 @@ describe('runCompile dependency discovery', () => {
 		expect(generated).toContain('export const Faktura');
 		expect(generated).toContain('.min(10).max(10)');
 		expect(generated).toContain('[0-9]{10}');
+		expect(generated).toContain('.describe("Identyfikator podatkowy NIP")');
+		expect(generated).not.toMatch(/"NIP":.*\/\//);
 	});
 
 	it('fails before writing output when dependency basenames are ambiguous', async () => {

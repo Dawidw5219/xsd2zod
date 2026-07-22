@@ -262,8 +262,7 @@ function emitField(field: IRObjectField, ctx: SourceContext): string {
 	if (field.nillable) inner = `z.union([${inner}, z.null()])`;
 	if (field.default !== undefined) inner = `${inner}.default(${jsString(field.default)})`;
 	if (!field.required) inner = `${inner}.optional()`;
-	const annotation = field.doc ? ` // ${field.doc.replace(/\n/g, ' ').slice(0, 120)}` : '';
-	return `${jsString(field.name)}: ${inner},${annotation}`;
+	return `${jsString(field.name)}: ${inner},`;
 }
 
 function emitAttributeField(a: IRAttribute, ctx: SourceContext): string {
@@ -276,8 +275,7 @@ function emitAttributeField(a: IRAttribute, ctx: SourceContext): string {
 	if (a.use !== 'required') inner = `${inner}.optional()`;
 	// XSD attributes → keys prefixed with `@` to avoid collision with elements.
 	const key = jsString(`@${a.name}`);
-	const annotation = a.doc ? ` // ${a.doc.replace(/\n/g, ' ').slice(0, 120)}` : '';
-	return `${key}: ${inner},${annotation}`;
+	return `${key}: ${inner},`;
 }
 
 function emitArray(t: Extract<IRType, { kind: 'array' }>, ctx: SourceContext): string {
