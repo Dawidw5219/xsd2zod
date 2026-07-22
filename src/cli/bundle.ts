@@ -4,6 +4,7 @@ import { basename, dirname, join, resolve } from 'node:path';
 import chalk from 'chalk';
 
 import { bundleXsd } from '../bundler';
+import { buildImportsMap } from './imports';
 
 export interface CliBundleOptions {
 	outFile?: string;
@@ -25,7 +26,10 @@ export async function runBundle(
 		throw new Error(`Bundle input must be a single .xsd file: ${input}`);
 	}
 
-	const bundled = bundleXsd({ filePath: absPath });
+	const bundled = bundleXsd({
+		filePath: absPath,
+		imports: buildImportsMap([dirname(absPath)]),
+	});
 
 	const outFile = opts.outFile
 		? resolve(opts.outFile)
