@@ -75,6 +75,11 @@ xsd2zod schemas/order.xsd schemas/customer.xsd --outDir generated/
 # across the whole input set.
 ```
 
+Dependency discovery is recursive. If a regulator ships `main.xsd` next to a
+`bazowe/` or `common/` directory, compiling `main.xsd` is enough — nested
+`xs:import`, `xs:include`, `xs:redefine`, and `xs:override` files are indexed
+automatically, including URL-style `schemaLocation` values used by KSeF FA(3).
+
 ### Bundle multi-file XSD into a single self-contained `.xsd`
 
 When your schema imports other schemas (e.g. official MF / EU / ISO standards

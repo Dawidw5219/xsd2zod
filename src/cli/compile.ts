@@ -5,7 +5,7 @@ import {
 	statSync,
 	writeFileSync,
 } from 'node:fs';
-import { basename, dirname, join, resolve } from 'node:path';
+import { basename, dirname, join, relative, resolve, sep } from 'node:path';
 
 import chalk from 'chalk';
 
@@ -51,20 +51,63 @@ function collectInputs(inputs: string[]): InputFile[] {
 	return out;
 }
 
-// Collect every `.xsd` from each input's parent directory so xs:include /
-// xs:import keyed by basename resolve without manual import wiring.
+// Dependencies published by regulators are commonly kept in nested folders
+// while schemaLocation still points at an absolute URL. Index the whole local
+// schema tree so URL imports can resolve by basename without network access.
 function buildImportsMap(files: InputFile[]): Record<string, string> {
 	const seenDirs = new Set<string>();
 	const imports: Record<string, string> = {};
 	for (const { baseDir } of files) {
 		if (seenDirs.has(baseDir)) continue;
 		seenDirs.add(baseDir);
-		for (const f of readdirSync(baseDir)) {
-			if (!f.endsWith('.xsd')) continue;
-			imports[f] = readFileSync(join(baseDir, f), 'utf-8');
+		for (const absPath of collectDependencyFiles(baseDir)) {
+			const source = readFileSync(absPath, 'utf-8');
+			const relativePath = relative(baseDir, absPath).split(sep).join('/');
+			registerImport(imports, relativePath, source, absPath);
+			registerImport(imports, absPath, source, absPath);
+			registerImport(imports, basename(absPath), source, absPath);
 		}
 	}
 	return imports;
+}
+
+function collectDependencyFiles(rootDir: string): string[] {
+	const files: string[] = [];
+	const visit = (dir: string): void => {
+		const entries = readdirSync(dir, { withFileTypes: true }).sort((a, b) =>
+			a.name.localeCompare(b.name),
+		);
+		for (const entry of entries) {
+			const absPath = join(dir, entry.name);
+			if (
+				entry.isDirectory() &&
+				entry.name !== 'node_modules' &&
+				!entry.name.startsWith('.')
+			) {
+				visit(absPath);
+			} else if (entry.isFile() && entry.name.endsWith('.xsd')) {
+				files.push(absPath);
+			}
+		}
+	};
+	visit(rootDir);
+	return files;
+}
+
+function registerImport(
+	imports: Record<string, string>,
+	key: string,
+	source: string,
+	absPath: string,
+): void {
+	const existing = imports[key];
+	if (existing !== undefined && existing !== source) {
+		throw new Error(
+			`Ambiguous XSD import key "${key}" while indexing "${absPath}". ` +
+				'Use unique dependency filenames or compile each schema family in a separate invocation.',
+		);
+	}
+	imports[key] = source;
 }
 
 interface PlannedWrite {
@@ -98,9 +141,8 @@ export async function runCompile(
 		const stem = basename(absPath, '.xsd');
 		const outDir = outDirOpt ? resolve(outDirOpt) : baseDir;
 
-		const source = readFileSync(absPath, 'utf-8');
 		const result = xsdToZod({
-			source,
+			filePath: absPath,
 			imports,
 			allowMissingImports: opts.allowMissingImports ?? false,
 		});
