@@ -57,6 +57,12 @@ describe('runCompile dependency discovery', () => {
       <xs:pattern value="[0-9]{10}"/>
     </xs:restriction>
   </xs:simpleType>
+  <xs:simpleType name="TStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="1"><xs:annotation><xs:documentation>Aktywna</xs:documentation></xs:annotation></xs:enumeration>
+      <xs:enumeration value="2"><xs:annotation><xs:documentation>Anulowana</xs:documentation></xs:annotation></xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
 </xs:schema>`,
 		);
 
@@ -70,6 +76,9 @@ describe('runCompile dependency discovery', () => {
 		expect(generated).toContain('[0-9]{10}');
 		expect(generated).toContain('.describe("Identyfikator podatkowy NIP")');
 		expect(generated).not.toMatch(/"NIP":.*\/\//);
+		expect(generated).toContain(
+			'.meta({ valueDocs: { "1": "Aktywna", "2": "Anulowana" } })',
+		);
 	});
 
 	it('fails before writing output when dependency basenames are ambiguous', async () => {

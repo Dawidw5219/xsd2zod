@@ -218,7 +218,12 @@ function emitAnyURI(t: Extract<IRType, { kind: 'anyURI' }>): string {
 
 function emitEnum(t: Extract<IRType, { kind: 'enum' }>): string {
 	const values = t.values.map((v) => jsString(v.value)).join(', ');
-	return appendDescribe(`z.enum([${values}])`, t.doc);
+	const documentedValues = t.values.filter((value) => value.doc !== undefined);
+	const valueDocs = documentedValues
+		.map((value) => `${jsString(value.value)}: ${jsString(value.doc ?? '')}`)
+		.join(', ');
+	const metadata = valueDocs ? `.meta({ valueDocs: { ${valueDocs} } })` : '';
+	return appendDescribe(`z.enum([${values}])${metadata}`, t.doc);
 }
 
 function emitObject(t: IRObject, ctx: SourceContext): string {

@@ -99,7 +99,16 @@ function build(t: IRType, ctx: RuntimeContext): z.ZodTypeAny {
 		case 'enum': {
 			if (t.values.length === 0) return z.never();
 			const values = t.values.map((v) => v.value) as [string, ...string[]];
-			return withDocRuntime(z.enum(values), t.doc);
+			const valueDocs = Object.fromEntries(
+				t.values
+					.filter((value) => value.doc !== undefined)
+					.map((value) => [value.value, value.doc]),
+			);
+			const schema = z.enum(values);
+			const withMetadata = Object.keys(valueDocs).length > 0
+				? schema.meta({ valueDocs })
+				: schema;
+			return withDocRuntime(withMetadata, t.doc);
 		}
 		case 'object':
 			return buildObject(t, ctx);
@@ -234,4 +243,3 @@ function lookup(
 	}
 	return ctx.schema.types[name];
 }
-
