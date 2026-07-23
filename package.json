@@ -1,5 +1,5 @@
 {
-  "name": "xsd2zod",
+  "name": "@app4you/xsd2zod",
   "version": "1.0.1",
   "description": "Compile XSD (XML Schema) into Zod schemas. CLI tool — one .xsd in, one .ts out",
   "private": false,

@@ -1,13 +1,13 @@
 # xsd2zod
 
-[![npm version](https://img.shields.io/npm/v/xsd2zod.svg?color=cb3837&logo=npm)](https://www.npmjs.com/package/xsd2zod)
+[![npm version](https://img.shields.io/npm/v/%40app4you%2Fxsd2zod.svg?color=cb3837&logo=npm)](https://www.npmjs.com/package/@app4you/xsd2zod)
 [![license](https://img.shields.io/npm/l/xsd2zod.svg?color=blue)](./LICENSE)
 
 Compile XSD (XML Schema) into [Zod](https://zod.dev) schemas. CLI tool — one
 `.xsd` in, one `.ts` out.
 
 ```bash
-npx xsd2zod schema.xsd
+npx @app4you/xsd2zod schema.xsd
 # → schema.ts (next to source, with all types as Zod schemas)
 ```
 
@@ -28,10 +28,10 @@ human-readable labels for free.
 
 ```bash
 # Global (recommended for CLI usage)
-npm install -g xsd2zod
+npm install -g @app4you/xsd2zod
 
 # Or use directly with npx (no install)
-npx xsd2zod schema.xsd
+npx @app4you/xsd2zod schema.xsd
 
 # Or as a dev dependency for codegen scripts
 pnpm add -D xsd2zod

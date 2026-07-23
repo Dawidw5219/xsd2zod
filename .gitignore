@@ -5,3 +5,5 @@ dist
 coverage
 .probe-out
 todo.md
+.sophia
+.claude
